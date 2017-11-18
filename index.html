@@ -2,6 +2,7 @@
 <html>
 <head>
   <title>Markdown Editor</title>
+  <meta charset="utf-8" /> 
   <script src="markdown-it.js"></script>
   <script src="markdown-it-footnote.js"></script>
   <script src="highlight.pack.js"></script>
@@ -32,7 +33,7 @@
       top: 0;
       left: 0;
       bottom: 0;
-      width: 50%;
+      width: 100%;
       height: auto;
       overflow: auto;
       font-size: 12px;
@@ -242,7 +243,6 @@ the inspiration to this, and some handy implementation hints, came.
  * [highlight.js](http://softwaremaniacs.org/soft/highlight/en/) for syntax highlighting in output code blocks
  * [js-deflate](https://github.com/dankogai/js-deflate) for gzipping of data to make it fit in URLs
 </textarea></form></div>
-  <div id="out"></div>
   <div id="menu">
     <span>Save As</span>
     <div id="saveas-markdown">
@@ -296,34 +296,8 @@ the inspiration to this, and some handy implementation hints, came.
     var hashto;
 
     function update(e){
-      setOutput(e.getValue());
-
       clearTimeout(hashto);
       hashto = setTimeout(updateHash, 1000);
-    }
-
-    function setOutput(val){
-      val = val.replace(/<equation>((.*?\n)*?.*?)<\/equation>/ig, function(a, b){
-        return '<img src="http://latex.codecogs.com/png.latex?' + encodeURIComponent(b) + '" />';
-      });
-
-      var out = document.getElementById('out');
-      var old = out.cloneNode(true);
-      out.innerHTML = md.render(val);
-      emojify.run(out);
-
-      var allold = old.getElementsByTagName("*");
-      if (allold === undefined) return;
-
-      var allnew = out.getElementsByTagName("*");
-      if (allnew === undefined) return;
-
-      for (var i = 0, max = Math.min(allold.length, allnew.length); i < max; i++) {
-        if (!allold[i].isEqualNode(allnew[i])) {
-          out.scrollTop = allnew[i].offsetTop;
-          return;
-        }
-      }
     }
 
     var editor = CodeMirror.fromTextArea(document.getElementById('code'), {
@@ -446,7 +420,6 @@ the inspiration to this, and some handy implementation hints, came.
     if(window.location.hash){
       var h = window.location.hash.replace(/^#/, '');
       if(h.slice(0,5) == 'view:'){
-        setOutput(decodeURIComponent(escape(RawDeflate.inflate(atob(h.slice(5))))));
         document.body.className = 'view';
       }else{
         editor.setValue(
